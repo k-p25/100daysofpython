@@ -2,7 +2,27 @@ from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip  # type: ignore
-
+import json
+# ---------------------------- SEARCH ------------------------------- #
+def find_password(): 
+    website = website_input.get()
+    
+    if website:
+        try:
+            with open("data.json", 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            messagebox.showwarning(text="Unreal", message="No Data File Found")
+        else:
+            if website in data:
+                email = data[website]["email"]
+                password = data[website]["password"]
+                messagebox.showinfo(message=f'Email: {email}\nPassword: {password}')
+            else:
+                messagebox.showwarning(title="Error", message=f"No details for {website} exists.")
+                
+        
+    
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 #Password Generator Project
 def generate_password():
@@ -29,22 +49,32 @@ def save():
     website = website_input.get()
     email = eu_input.get()
     password = password_input.get()
+    new_data = {
+        website: {
+            "email": email,
+            "password": password
+        }
+    }
 
-    if website and email and password:
-        is_ok = messagebox.askokcancel(title=website, message=f'Email: {email} \nPassword: {password} \nSave?')
-    else:
+    if not website or not password:
         messagebox.showwarning(title="oops", message="Please don't leave any fields empty!")
+    else:
+        try:
+            with open ("data.json", 'r') as f:
+                data=json.load(f)
+                data.update(new_data)
+        except:
+            data = new_data
+
+        with open ("data.json", 'w') as f:
+            json.dump(new_data, f, indent=4)
     
-    if is_ok:
-        with open ("data.txt", 'a') as f:
-            if website_input.get() and password_input.get():
-                f.write(f'{website} | {email} | {password}')
             website_input.delete(0, END)
             password_input.delete(0, END)
 # ---------------------------- UI SETUP ------------------------------- #
 
 window = Tk()
-window.title("Pomodoro")
+window.title("Password Manager")
 window.config(padx=50, pady=50)
 
 canvas = Canvas(width=200, height=200)
@@ -55,9 +85,12 @@ canvas.grid(column=2, row=1)
 website = Label(text="Website:")
 website.grid(column=1, row=2)
 
-website_input = Entry(width=35)
+website_input = Entry(width=21)
 website_input.focus()
-website_input.grid(column=2, row=2, columnspan=2)
+website_input.grid(column=2, row=2)
+
+search = Button(text="Search", width=12, font=("Segoe UI", 10, "normal"), command=find_password)
+search.grid(column=3, row=2)
 
 eu = Label(text="Email/Username:")
 eu.grid(column=1, row=3)
