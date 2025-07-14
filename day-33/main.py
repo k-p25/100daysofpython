@@ -6,8 +6,8 @@ import smtplib
 
 MY_EMAIL = "anemail@gmail.com"
 MY_PWD = "apassword"
-MY_LAT = 8.530240
-MY_LNG = 76.929100
+MY_LAT = 41.902782
+MY_LNG = 12.496365
 
 def is_iss_overhead():
     response = requests.get(url='http://api.open-notify.org/iss-now.json')
